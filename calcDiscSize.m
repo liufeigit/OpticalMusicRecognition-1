@@ -1,10 +1,9 @@
 function [discSize] = calcDiscSize(lineDist)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % calcDiscSize calculates the disc size used for the structure element,
-% using the average distance between two lines
+% using the lineDist
 %
-% linepos: The lines' positions
-% lineheight: The average height of a line
+% lineDist: the average distance between two lines
 %
 % discSize: radius to use for the disc structure element.
 %
