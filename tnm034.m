@@ -23,7 +23,7 @@ imagerot = imagerot(10:end-10,10:end-10,:);
 gray2 = rgb2gray(imagerot);
 
 %find the position of the stafflines
-[linepos] = findlines(gray2);
+[linepos] = findlines(gray2)
 
 %get binary image 
 lvl = graythresh(gray2);
@@ -51,20 +51,107 @@ notes = imreconstruct(open2, binImg);
 % imshow(notes);
 
 
-%%
+%% Find the blobs for every note !
+%
 %Labeling
-imgLabel = bwlabel(notes, 8);
+imgLabel = bwlabel(open2, 8);
 STATS = regionprops(imgLabel, 'BoundingBox', 'Centroid');
-figure
-imshow(notes)
-%Print boundingboxes and centroids
-for i = 1:length(STATS)
-    BB = STATS(i).BoundingBox;
-    CE = STATS(i).Centroid;
-    rectangle('Position',BB,'EdgeColor','g', 'LineWidth', 1)
-    hold on
-    plot(CE(1), CE(2), '-m+')    
+
+
+
+
+
+figure;
+imshow(open2);
+
+distance = zeros(1,2);
+line = 0;
+MChar = ['a','g','f','e','d','c','b','a','g','f','e','d','c'];
+
+TestArray = [120,125,130,135,140,145,149,155,159,165,168,175,178];
+
+
+for i = 4:length(STATS)
+     CE = STATS(i).Centroid;
+     BB = STATS(i).BoundingBox;
+    
+    if 208 > CE(1,2)
+        
+        %disp('Ligger på rätt rad')
+        
+        for i = 1:5
+            
+            if(linepos(1,i)>= CE(1,2))
+                
+                if(i==1)
+                    mindist = linepos(1,i) - CE(1,2);
+                    if(mindist>0)
+                      %Överförsta linjen !
+                      
+                      if(mod (ceil(CE(1,2)),5)~= 0)
+                     
+                        line = ceil(CE(1,2))+mod (ceil(CE(1,2)),5);
+                      else
+                        line = ceil(CE(1,2)); 
+                      end
+                    
+                    %Kolla om den mer än ett radavstånd från första raden
+                   
+                    end
+                    break;
+                
+                elseif(linepos(1,i)==CE(1,2))
+                    %Träffar exakt på linepos
+                    break;
+                else
+                    distance(1) = abs(linepos(1,i) - CE(1,2));
+                    distance(2) = abs(linepos(1,i-1) - CE(1,2));
+                    [mindist,index]=min(distance);
+                    
+                    if(mindist>=1.8)
+                    %Mellan två linjer eller över först eller under sista raden  
+                   
+       
+                    c = 5 - mod (ceil(CE(1,2)),5);
+                    line = ceil(CE(1,2))+c;
+                   
+                   
+                    elseif(index==1)
+                            line=linepos(1,i);
+                    else
+                            line=linepos(1,i-1);
+                    end
+                 
+                    break;
+                end
+            end
+            
+        end
+       
+        
+        if((0<mindist) && (mindist<=1.8))
+         a = find(TestArray==line);
+         disp(MChar(a))    
+         rectangle('Position',BB,'EdgeColor','r', 'LineWidth', 1)
+        else
+         a = find(TestArray==line);
+         disp(MChar(a))
+         rectangle('Position',BB,'EdgeColor','b', 'LineWidth', 1)
+        end
+        
+        hold on
+        plot(CE(1), CE(2), '-m+')
+    
+    else
+        
+        
+    end
+    
+    
+    
 end
+
+
 
 
 
