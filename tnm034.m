@@ -80,23 +80,31 @@ for i = 4:length(STATS)
         %disp('Ligger på rätt rad')
         
         for i = 1:5
-            
+            %HÄR BLIR DET FEL SE ÖVER DETTA !!!!!
             if(linepos(1,i)>= CE(1,2))
                 
                 if(i==1)
-                    mindist = linepos(1,i) - CE(1,2);
-                    if(mindist>0)
+                    disp('----------------Koll om punkten ligger över första------------------------')
+                    mindist = linepos(1,i) - CE(1,2)
+                    if((0<mindist) && (mindist<=1.8))
+                        a = 5 - mod (ceil(CE(1,2)),5)
+                        line = a + ceil(CE(1,2))
+                    elseif(mindist>0)
                       %Överförsta linjen !
                       
                       if(mod (ceil(CE(1,2)),5)~= 0)
-                     
-                        line = ceil(CE(1,2))+mod (ceil(CE(1,2)),5);
+                        disp('mod (ceil(CE(1,2)),5)')
+                        mod (ceil(CE(1,2)),5)
+                        disp('ceil(CE(1,2))')
+                        ceil(CE(1,2))
+                        line = ceil(CE(1,2))- mod (ceil(CE(1,2)),5)
                       else
-                        line = ceil(CE(1,2)); 
+                        disp('--------Else satsen-----------')
+                        line = ceil(CE(1,2)) 
                       end
                     
                     %Kolla om den mer än ett radavstånd från första raden
-                   
+                    disp('--------------------------------------------------------------------------')
                     end
                     break;
                 
@@ -104,6 +112,7 @@ for i = 4:length(STATS)
                     %Träffar exakt på linepos
                     break;
                 else
+                    disp('----------------------Kollar dom andra missar e , på den tredje ----------')
                     distance(1) = abs(linepos(1,i) - CE(1,2));
                     distance(2) = abs(linepos(1,i-1) - CE(1,2));
                     [mindist,index]=min(distance);
@@ -111,7 +120,7 @@ for i = 4:length(STATS)
                     if(mindist>=1.8)
                     %Mellan två linjer eller över först eller under sista raden  
                    
-       
+                    
                     c = 5 - mod (ceil(CE(1,2)),5);
                     line = ceil(CE(1,2))+c;
                    
