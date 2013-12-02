@@ -68,16 +68,16 @@ distance = zeros(1,2);
 line = 0;
 MChar = ['a','g','f','e','d','c','b','a','g','f','e','d','c'];
 
-TestArray = [120,125,130,135,140,145,149,155,159,165,168,175,178];
+TestArray = [125,130,135,140,145,149,155,159,165,168,175,178];
 
 
-for i = 4:length(STATS)
-     CE = STATS(i).Centroid;
-     BB = STATS(i).BoundingBox;
+for j = 4:length(STATS)
+     CE = STATS(j).Centroid;
+     BB = STATS(j).BoundingBox;
     
     if 208 > CE(1,2)
         
-        %disp('Ligger på rätt rad')
+     
         
         for i = 1:5
             %HÄR BLIR DET FEL SE ÖVER DETTA !!!!!
@@ -106,7 +106,8 @@ for i = 4:length(STATS)
                     %Kolla om den mer än ett radavstånd från första raden
                     disp('--------------------------------------------------------------------------')
                     end
-                    break;
+                    
+                break;
                 
                 elseif(linepos(1,i)==CE(1,2))
                     %Träffar exakt på linepos
@@ -159,8 +160,8 @@ for i = 4:length(STATS)
     
     
 end
-
-
+disp('--------------------------------Slut inline ---------------------------------------')
+a = findNotes(linepos,10,open2);
 
 
 
