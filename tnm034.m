@@ -1,5 +1,5 @@
 function [ strout ] = tnm034(image)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % tnm034 is a function to take sheet music as input and read which notes are
 % written. OMR, Optical Music Recognition.
 %
@@ -11,7 +11,7 @@ function [ strout ] = tnm034(image)
 % Written by:
 % Albin Törnqvist, Emil Rydkvist, Jonas Petersson, Erik Junholm
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %correct the image's rotation
@@ -43,125 +43,58 @@ binImg = removestafflines(binImg, linepos, 2);
 se = strel('disk', 4);
 open2 = imopen(binImg, se);
 
-% figure;
-% imshow(open2);
+%figure;
+%imshow(open2);
 
 notes = imreconstruct(open2, binImg);
-% figure;
-% imshow(notes);
+%figure;
+%imshow(notes);
+
+
+
+% How many row 
+number_of_rows = size(linepos,2)/5;
+
+number_of_rows
+long_distance = zeros(1,number_of_rows);
+index = 1;
+for i= 1:1:size(linepos,2)
+    if(mod(i,5)==0)
+        if(i == size(linepos,2))
+            break;
+        else
+            long_distance(index) = linepos(i+1)-linepos(i);
+            index = index + 1;
+        end
+    end
+end
+long_distance
+long_distance_half = long_distance./2;
+long_distance_half(3) = long_distance_half(2); 
+
+split_image = cell(1,number_of_rows);
+% Split the image 
+for i = 1:1:number_of_rows
+    split_image{i} = notes(linepos(5*(i-1)+1)-long_distance_half(i):linepos(5*(i-1)+5)+long_distance_half(i),:,:);
+end
+
+A = linepos(1) -long_distance_half(1);
+linepostemp = linepos(1:5)-A
+
+
+
 
 
 %% Find the blobs for every note !
 %
-%Labeling
-imgLabel = bwlabel(open2, 8);
-STATS = regionprops(imgLabel, 'BoundingBox', 'Centroid');
 
+%figure;
+%imshow(open2);
 
+%distance = zeros(1,2);
+readsegment(split_image{1},linepostemp,10)
 
-
-
-figure;
-imshow(open2);
-
-distance = zeros(1,2);
-line = 0;
-MChar = ['a','g','f','e','d','c','b','a','g','f','e','d','c'];
-
-TestArray = [125,130,135,140,145,149,155,159,165,168,175,178];
-
-
-for j = 4:length(STATS)
-     CE = STATS(j).Centroid;
-     BB = STATS(j).BoundingBox;
-    
-    if 208 > CE(1,2)
-        
-     
-        
-        for i = 1:5
-            %HÄR BLIR DET FEL SE ÖVER DETTA !!!!!
-            if(linepos(1,i)>= CE(1,2))
-                
-                if(i==1)
-                    disp('----------------Koll om punkten ligger över första------------------------')
-                    mindist = linepos(1,i) - CE(1,2)
-                    if((0<mindist) && (mindist<=1.8))
-                        a = 5 - mod (ceil(CE(1,2)),5)
-                        line = a + ceil(CE(1,2))
-                    elseif(mindist>0)
-                      %Överförsta linjen !
-                      
-                      if(mod (ceil(CE(1,2)),5)~= 0)
-                        disp('mod (ceil(CE(1,2)),5)')
-                        mod (ceil(CE(1,2)),5)
-                        disp('ceil(CE(1,2))')
-                        ceil(CE(1,2))
-                        line = ceil(CE(1,2))- mod (ceil(CE(1,2)),5)
-                      else
-                        disp('--------Else satsen-----------')
-                        line = ceil(CE(1,2)) 
-                      end
-                    
-                    %Kolla om den mer än ett radavstånd från första raden
-                    disp('--------------------------------------------------------------------------')
-                    end
-                    
-                break;
-                
-                elseif(linepos(1,i)==CE(1,2))
-                    %Träffar exakt på linepos
-                    break;
-                else
-                    disp('----------------------Kollar dom andra missar e , på den tredje ----------')
-                    distance(1) = abs(linepos(1,i) - CE(1,2));
-                    distance(2) = abs(linepos(1,i-1) - CE(1,2));
-                    [mindist,index]=min(distance);
-                    
-                    if(mindist>=1.8)
-                    %Mellan två linjer eller över först eller under sista raden  
-                   
-                    
-                    c = 5 - mod (ceil(CE(1,2)),5);
-                    line = ceil(CE(1,2))+c;
-                   
-                   
-                    elseif(index==1)
-                            line=linepos(1,i);
-                    else
-                            line=linepos(1,i-1);
-                    end
-                 
-                    break;
-                end
-            end
-            
-        end
-       
-        
-        if((0<mindist) && (mindist<=1.8))
-         a = find(TestArray==line);
-         disp(MChar(a))    
-         rectangle('Position',BB,'EdgeColor','r', 'LineWidth', 1)
-        else
-         a = find(TestArray==line);
-         disp(MChar(a))
-         rectangle('Position',BB,'EdgeColor','b', 'LineWidth', 1)
-        end
-        
-        hold on
-        plot(CE(1), CE(2), '-m+')
-    
-    else
-        
-        
-    end
-    
-    
-    
-end
-disp('--------------------------------Slut inline ---------------------------------------')
-a = findNotes(linepos,10,open2);
+%findNotes(linepostemp,10,split_image{1})
 
 
 

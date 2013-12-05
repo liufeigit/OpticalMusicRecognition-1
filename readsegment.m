@@ -69,7 +69,7 @@ for i = 2:length(STATS)
 %         line2 = strel('line', 4, -angle);
 %         
 %         notePart = noNoteHeads(:,(top_x-margin):(top_x+delta_x+margin));
-        
+        notechar = [notechar,upper(readFindNotes(CE,linepos))];
         
     end
 
