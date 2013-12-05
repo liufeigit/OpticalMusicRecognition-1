@@ -1,85 +1,73 @@
 function [StringOutput] = findNotes(lineArrayRow, lineheight ,binImg)
-%imgLabel = bwlabel(binImg, 8);
+imgLabel = bwlabel(binImg, 8);
 STATS = regionprops(bwlabel(binImg, 8), 'BoundingBox', 'Centroid');
 %Notes from the 
-
-MChar = ['g','f','e','d','c','b','a','g','f','e','d','c'];
+%figure;
+%imshow(binImg);
+MChar = ['a','g','f','e','d','c','b','a','g','f','e','d','c'];
 
 line = 0;
+
 TestArray = [125,130,135,140,145,149,155,159,165,168,175,178];
+TestArray1 = zeros(1,13);
+lineDist = calcLineDist(lineArrayRow,0)
+
+TestArray1(1) = lineArrayRow(1)-lineDist;
+TestArray1(2) = lineArrayRow(1)-lineDist/2;
+TestArray1(3) = lineArrayRow(1) ;
+TestArray1(4) = lineArrayRow(1) + (lineArrayRow(2)-lineArrayRow(1))/2;
+TestArray1(5) = lineArrayRow(2) ;
+TestArray1(6) = lineArrayRow(2) + (lineArrayRow(3)-lineArrayRow(2))/2;
+TestArray1(7) = lineArrayRow(3) ;
+TestArray1(8) = lineArrayRow(3) + (lineArrayRow(4)-lineArrayRow(3))/2;
+TestArray1(9)  = lineArrayRow(4);
+TestArray1(10) = lineArrayRow(4) + (lineArrayRow(5)-lineArrayRow(4))/2;
+TestArray1(11) = lineArrayRow(5);
+TestArray1(12) = lineArrayRow(5)+lineDist/2;
+TestArray1(13) = lineArrayRow(5)+lineDist;
 
 
-for j = 4:length(STATS)
+TestArray1 = round(TestArray1);
+TestArray1
+mindist = 0;
+
+for j = 2:length(STATS)
      
     CE = STATS(j).Centroid;
     BB = STATS(j).BoundingBox;
     
-    if 208 > CE(1,2)        
-        for i = 1:5
-            if(lineArrayRow(1,i)>= CE(1,2))         
-                if(i==1)
-                  
-                    mindist = lineArrayRow(1,i) - CE(1,2);
-                    %Kollar om punkten ligger på linjen
-                    if(mod(ceil(CE(1,2)),5)== 0)
-                        line = ceil(CE(1,2));
-                    elseif((0<mindist) && (mindist<=1.8))
-                        a = 5 - mod (ceil(CE(1,2)),5);
-                        
-                        line = a + ceil(CE(1,2));
-                        
-                    elseif(mindist>0)
-                       
-                        if(mod (ceil(CE(1,2)),5)~= 0)
-                            line = ceil(CE(1,2))- mod (ceil(CE(1,2)),5);
-                        else
-                            line = ceil(CE(1,2));
-                        end
-                    end
-                else
-                    %disp('----------------------Kollar dom andra missar e , på den tredje ----------')
-                    distance(1) = abs(lineArrayRow(1,i) - CE(1,2));
-                    distance(2) = abs(lineArrayRow(1,i-1) - CE(1,2));
-                    [mindist,index]=min(distance);
-                    
-                    if(mindist>=1.8)
-                        %Mellan två linjer eller över första eller under sista raden
-                        
-                        if(mod(ceil(CE(1,2)),5)== 0)
-                            %disp('Hamnar precis på en rad !')
-                            %hej = ceil(CE(1,2))
-                            %mod (ceil(CE(1,2)),5)
-                            line = ceil(CE(1,2));
-                        else
-                        
-                            c = 5 - mod (ceil(CE(1,2)),5);
-                            line = ceil(CE(1,2))+c;
-                        end
-                        
-                    elseif(index==1)
-                        line=lineArrayRow(1,i);
-                    else
-                        line=lineArrayRow(1,i-1);
-                    end
-                    
-                    break;
-                end
-            end
-            
-        end
-       
-        
-        if((0<mindist) && (mindist<=1.8))
-         a = find(TestArray==line);
-         disp(MChar(a))    
-         %rectangle('Position',BB,'EdgeColor','r', 'LineWidth', 1)
-        else
-         a = find(TestArray==line);
-         disp(MChar(a))
-         %rectangle('Position',BB,'EdgeColor','b', 'LineWidth', 1)
-        end    
+   
+    a = binImg(:,round(BB(1):BB(1)+BB(3)));
+    %figure;
+    %imshow(a);
+    %figure;
+    BW2 = bwmorph(a,'thin',Inf);
+   % figure;
+    %imshow(BW2);
+    se = strel('disk', 4);
+    open2 = imopen(a, se);
+    %imshow(open2);
+    
+    
+    imgLabel2 = bwlabel(open2, 8);
+    STATSsmallimage = regionprops(bwlabel(open2, 8), 'BoundingBox', 'Centroid');
+    for i = 1:length(STATSsmallimage)
+         CE2 = STATSsmallimage(i).Centroid;
+         BB2 = STATSsmallimage(i).BoundingBox
+         %ful hacks !!
+         if((BB2(3)> 7.0) && (BB2(4)>7.0))
+            distance =  abs(TestArray1-ceil(CE2(1,2)));
+            [tmp,idx] =min(distance);
+            line = TestArray1(idx);
+            a = find(TestArray1==line);
+            disp(MChar(a))
+         end  
     end
+    
+    
+
+
 end
 
-StringOutput = 0;
+ StringOutput = 0;
 end
