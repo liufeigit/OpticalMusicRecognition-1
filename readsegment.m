@@ -1,21 +1,21 @@
-function [notechar] = readsegment(binImg)
+function [notechar] = readsegment(binImg,linepos,lineheight)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
 %
 disk = strel('disk', 4);
 diskOpen = imopen(binImg, disk); %picture including only noteheads
-
+notechar = '';
 noteImg = imreconstruct(diskOpen, binImg);
 
-segment = noteImg(90:198, :);
+
 %
 
 
 %destroy beams in image for easier finding of noteheads
 line = strel('line', 20, 0);
-lines = imopen(segment, line);
-sliced = segment - lines;
+lines = imopen(binImg, line);
+sliced = binImg - lines;
 
 
 %get picture with only noteheads
@@ -26,21 +26,21 @@ imgLabel = bwlabel(noteHeads, 8);
 STATS = regionprops(imgLabel, 'BoundingBox', 'Centroid');
 
 %image with only beams
-noNoteHeads = segment - noteHeads;
+noNoteHeads = binImg - noteHeads;
 line2 = strel('line', 10, 0);
 beams = imopen(noNoteHeads, line2);
 
-figure
-imshow(segment)
-figure
-imshow(beams)
+%figure
+%imshow(binImg)
+%figure
+%imshow(beams)
 
-for i = 13:14%length(STATS)
-    BB = STATS(i).BoundingBox;
+for i = 2:length(STATS)
+    
     CE = STATS(i).Centroid;
-    rectangle('Position',BB,'EdgeColor','g', 'LineWidth', 1)
-    hold on
-    plot(CE(1), CE(2), '-m+')
+    %rectangle('Position',BB,'EdgeColor','g', 'LineWidth', 1)
+    %hold on
+    %plot(CE(1), CE(2), '-m+')
     
     DATA = STATS(i).BoundingBox;
     top_x = round(DATA(1));
@@ -60,6 +60,7 @@ for i = 13:14%length(STATS)
         %more than eight note        
     elseif(numPeaks == 1)
         %eight note
+        notechar = [notechar,readFindNotes(CE,linepos)];
         
     else
 %         %quarter note or single eight note
@@ -71,13 +72,7 @@ for i = 13:14%length(STATS)
         
         
     end
-    
-    figure
-    plot(a)
-    
-    
-    figure
-    imshow(noteBeam)
+
     
 end
 

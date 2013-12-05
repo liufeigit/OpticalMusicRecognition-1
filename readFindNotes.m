@@ -25,6 +25,6 @@ distance =  abs(LookUpTable-ceil(centroid(1,2)));
 [~,idx] =min(distance);
 line = LookUpTable(idx);
         
-outchar = OutChar(LookUpTable==line);
+outchar = OutChar{LookUpTable==line};
 
 end
