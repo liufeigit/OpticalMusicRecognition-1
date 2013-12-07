@@ -16,7 +16,7 @@ function [ strout ] = tnm034(image)
 
 %correct the image's rotation
 imagerot = houghrotate(image);
-imagerot = imagerot(10:end-10,10:end-10,:);
+imagerot = imagerot(:,10:end,:);
 %convert image to grayscale
 gray2 = rgb2gray(imagerot);
 
