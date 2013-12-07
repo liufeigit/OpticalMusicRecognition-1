@@ -45,6 +45,12 @@ end
 %angle
 image_rot = imrotate(image,angle,'bicubic');
 
+%remove dirt around the image caused by the rotation
+dist = ceil((size(binImg, 2))*sin(angle*pi/180));
+image_rot(1:dist, :, :) = 1;
+image_rot(:, 1:dist, :) = 1;
+image_rot((size(image_rot,1)-dist):size(image_rot,1), :, :) = 1;
+image_rot(:, (size(image_rot,2)-dist):size(image_rot,2), :) = 1;
 
 end
 
