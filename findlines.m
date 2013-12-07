@@ -20,7 +20,7 @@ binImg2 = bwmorph(binImg2, 'thin');
 
 binImg2 = binImg2';
 
-binImg2(:,1:10) = 0;
+%binImg2(:,1:10) = 0;
 
 %Horizontal projection
 a = sum(binImg2);
