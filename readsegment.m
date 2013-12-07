@@ -43,25 +43,17 @@ STATS = regionprops(imgLabel, 'BoundingBox', 'Centroid');
 %image with only beams
 noNoteHeads = noteImg - noteHeads;
 line2 = strel('line', 10, 0);
+
 beams1 = imopen(noNoteHeads, line2);
 line2 = strel('line', 10, -20);
 beams2 = imopen(noNoteHeads, line2);
 beams = beams1 + beams2;
 beams = im2bw(beams);
-% figure
-% imshow(noteImg);
-% figure
-imshow(noteHeads)
-figure
-% imshow(noNoteHeads)
-% figure
-% imshow(beams)
+
 for i = 2:length(STATS)
     
     CE = STATS(i).Centroid;
-    %rectangle('Position',BB,'EdgeColor','g', 'LineWidth', 1)
-    %hold on
-    %plot(CE(1), CE(2), '-m+')
+
     
     DATA = STATS(i).BoundingBox;
     top_x = round(DATA(1));
@@ -72,12 +64,10 @@ for i = 2:length(STATS)
     margin = 3;
     
     noteBeam = beams(:,(top_x-margin):(top_x+delta_x+margin));
-%     figure
-%     imshow(noteBeam)
+
     a = sum(noteBeam');
     
-%     figure
-%     plot(a);
+
     
     numPeaks = size(findpeaks(a, 'MINPEAKDISTANCE', 4), 2);
     
@@ -85,7 +75,7 @@ for i = 2:length(STATS)
         %more than eight note        
     elseif(numPeaks == 1)
         %eight note
-        %DATA
+     
         notechar = [notechar,readFindNotes(CE,linepos)];
         
     else
@@ -100,24 +90,18 @@ for i = 2:length(STATS)
       flagbeams = im2bw(flagbeams);
       
       noteBeam = flagbeams(:,(top_x-margin):(top_x+delta_x+margin));
-%       figure
-%       imshow(noteBeam);
+
       
       a = sum(noteBeam');
       numPeaks = size(findpeaks(a), 2);
-      
-%       figure
-%       plot(a);
+
       if(numPeaks == 0)
           notechar = [notechar,upper(readFindNotes(CE,linepos))];
       else
           notechar = [notechar,readFindNotes(CE,linepos)];
       end
       
-%       notePart = noNoteHeads(:,(top_x-margin):(top_x+delta_x+margin));
-        
-       % DATA
-        
+
     end
 
     

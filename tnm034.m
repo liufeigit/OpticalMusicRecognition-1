@@ -24,15 +24,13 @@ gray2 = rgb2gray(imagerot);
 
 %get binary image 
 binImg = adaptivethreshBW(gray2);
-
-
-
 %remove the stafflines
 binImg = removestafflines(binImg, linepos, 3);
 
 
 % How many row 
 number_of_rows = size(linepos,2)/5;
+
 long_distance_half = zeros(1,number_of_rows);
 index = 1;
 for i= 1:1:size(linepos,2)
@@ -45,12 +43,14 @@ for i= 1:1:size(linepos,2)
         end
     end
 end
+
 long_distance_half(end) = long_distance_half(end-1); 
 split_image = cell(1,number_of_rows);
 % Split the image 
 for i = 1:1:number_of_rows
     split_image{i} = binImg(linepos(5*(i-1)+1)-long_distance_half(i):linepos(5*(i-1)+5)+long_distance_half(i),:,:);
 end
+
 linepostemp = zeros(number_of_rows,5);
 A = zeros(1,number_of_rows);
 j = 0;
@@ -59,7 +59,6 @@ for i = 1:number_of_rows
     linepostemp(i,:) = linepos(5*j+1:5*j+5)-A(i);
     j=j+1; 
 end
-
 
 
 %% Find the blobs for every note !
@@ -71,11 +70,13 @@ end
 
 a = '';
 %imshow(split_image{2});
+
 for i = 1:number_of_rows
     a = [a,readsegment(split_image{i},linepostemp(i,:),2)];
     a = [a,'n'];
 end
 a
+
 
 
 
