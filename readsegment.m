@@ -2,12 +2,14 @@ function [notechar] = readsegment(binImg,linepos,lineheight)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 notechar = '';
-disk = strel('disk', 4);
+diskSize = calcDiscSize(calcLineDist(linepos, lineheight))
+
+disk = strel('disk', diskSize);
 diskOpen = imopen(binImg, disk); %picture including only noteheads
 
 noteImg = imreconstruct(diskOpen, binImg);
-figure;
-imshow(noteImg);
+% figure;
+% imshow(noteImg);
 
 %
 
@@ -25,10 +27,10 @@ lines3 = imopen(noteImg, line);
 line = strel('line', 20, 90);
 lines4 = imopen(noteImg, line);
 
-sliced = noteImg - lines;% - lines2 - lines3 - lines4;
-
-figure;
-imshow(sliced);
+sliced = noteImg - lines - lines2 - lines3 - lines4;
+sliced = im2bw(sliced);
+% figure;
+% imshow(sliced);
 
 
 %get picture with only noteheads
@@ -41,20 +43,17 @@ STATS = regionprops(imgLabel, 'BoundingBox', 'Centroid');
 %image with only beams
 noNoteHeads = noteImg - noteHeads;
 line2 = strel('line', 10, 0);
-beams = imopen(noNoteHeads, line2);
 
-figure;
-imshow(noteHeads)
-figure;
-imshow(noNoteHeads)
-figure
-imshow(beams)
+beams1 = imopen(noNoteHeads, line2);
+line2 = strel('line', 10, -20);
+beams2 = imopen(noNoteHeads, line2);
+beams = beams1 + beams2;
+beams = im2bw(beams);
+
 for i = 2:length(STATS)
     
     CE = STATS(i).Centroid;
-    %rectangle('Position',BB,'EdgeColor','g', 'LineWidth', 1)
-    %hold on
-    %plot(CE(1), CE(2), '-m+')
+
     
     DATA = STATS(i).BoundingBox;
     top_x = round(DATA(1));
@@ -65,28 +64,44 @@ for i = 2:length(STATS)
     margin = 3;
     
     noteBeam = beams(:,(top_x-margin):(top_x+delta_x+margin));
-    
+
     a = sum(noteBeam');
     
-    numPeaks = size(findpeaks(a), 2);
+
+    
+    numPeaks = size(findpeaks(a, 'MINPEAKDISTANCE', 4), 2);
     
     if(numPeaks > 1)
         %more than eight note        
     elseif(numPeaks == 1)
         %eight note
-        %DATA
+     
         notechar = [notechar,readFindNotes(CE,linepos)];
         
     else
-%       %quarter note or single eight note
-%       angle = 20;
-%       line1 = strel('line', 4, angle);
-%       line2 = strel('line', 4, -angle);
-%         
-%       notePart = noNoteHeads(:,(top_x-margin):(top_x+delta_x+margin));
-        notechar = [notechar,upper(readFindNotes(CE,linepos))];
-       % DATA
-        
+      %quarter note or single eight note
+      angle = 20;
+      flagLine1 = strel('line', 6, angle);
+      flagbeams1 = imopen(noNoteHeads, flagLine1);
+      flagLine2 = strel('line', 6, -angle);
+      flagbeams2 = imopen(noNoteHeads, flagLine2);
+      
+      flagbeams = flagbeams1 + flagbeams2;
+      flagbeams = im2bw(flagbeams);
+      
+      noteBeam = flagbeams(:,(top_x-margin):(top_x+delta_x+margin));
+
+      
+      a = sum(noteBeam');
+      numPeaks = size(findpeaks(a), 2);
+
+      if(numPeaks == 0)
+          notechar = [notechar,upper(readFindNotes(CE,linepos))];
+      else
+          notechar = [notechar,readFindNotes(CE,linepos)];
+      end
+      
+
     end
 
     
