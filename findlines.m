@@ -32,7 +32,7 @@ plot(a)
 threshold = (mean(a)/std(a))*max(a)
 
 %get peaks (line positions)
-[linepeaks,linepos] = findpeaks(a, 'MINPEAKHEIGHT', threshold);
+[linepeaks,linepos] = findpeaks(a, 'MINPEAKHEIGHT', threshold, 'MINPEAKDISTANCE', 5);
 
 end
 
