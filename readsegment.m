@@ -1,8 +1,8 @@
-function [notechar] = readsegment(binImg,linepos,lineheight)
+function [notechar] = readsegment(binImg,linepos,lineWidth)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 notechar = '';
-diskSize = calcDiscSize(calcLineDist(linepos, lineheight))
+diskSize = calcDiscSize(calcLineDist(linepos, lineWidth))
 
 disk = strel('disk', diskSize);
 diskOpen = imopen(binImg, disk); %picture including only noteheads
@@ -51,8 +51,8 @@ beams = im2bw(beams);
 % figure
 % imshow(noteImg);
 % figure
-% imshow(noteHeads)
-% figure
+imshow(noteHeads)
+figure
 % imshow(noNoteHeads)
 % figure
 % imshow(beams)

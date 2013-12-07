@@ -9,6 +9,6 @@ function [discSize] = calcDiscSize(lineDist)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-discSize = round(lineDist/2);
+discSize = ceil(lineDist/2);
 
 end
