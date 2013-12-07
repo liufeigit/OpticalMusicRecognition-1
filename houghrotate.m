@@ -44,7 +44,7 @@ else
 end
 %angle
 image_rot = imrotate(image,angle,'bicubic');
-angle
+
 
 end
 

@@ -16,7 +16,7 @@ function [ strout ] = tnm034(image)
 
 %correct the image's rotation
 imagerot = houghrotate(image);
-imagerot = imagerot(:,10:end,:);
+
 %convert image to grayscale
 gray2 = rgb2gray(imagerot);
 
@@ -62,18 +62,6 @@ for i = 1:number_of_rows
 end
 
 
-%     A  = linepos(1) -long_distance_half(1);
-%     A1 = linepos(6) -long_distance_half(2); 
-%     A2 = linepos(11) -long_distance_half(3);
-%     A3 = linepos(16) -long_distance_half(4);
-%     linepostemp(1,:) = linepos(1:5)-A;
-%     linepostemp(2,:) = linepos(6:10)-A1;
-%     linepostemp(3,:) = linepos(11:15)-A2;
-%     linepostemp(4,:) = linepos(16:20)-A3;
-% 
-% 
-
-
 %% Find the blobs for every note !
 %
 
@@ -83,7 +71,7 @@ end
 
 a = '';
 %imshow(split_image{2});
-for i = 1:number_of_rows
+for i = 1:1
     a = [a,readsegment(split_image{i},linepostemp(i,:),10)];
     a = [a,'n'];
 end
