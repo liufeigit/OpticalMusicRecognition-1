@@ -1,4 +1,4 @@
-function [ image_rot ] = houghrotate( image )
+function [ image_rot  ] = houghrotate( image )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % houghrotate finds the angle of the longest line with respect to the image
 % frame and rotates the image to get the line straight.
@@ -44,7 +44,7 @@ else
 end
 %angle
 image_rot = imrotate(image,angle,'bicubic');
-
+angle
 
 end
 

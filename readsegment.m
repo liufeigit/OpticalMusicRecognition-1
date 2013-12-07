@@ -16,16 +16,17 @@ imshow(noteImg);
 line = strel('line', 20, 0);
 lines = imopen(noteImg, line);
 
-line = strel('line', 15, 25);
+line = strel('line', 20, 25);
 lines2 = imopen(noteImg, line);
 
-line = strel('line', 15, -25);
+line = strel('line', 20, -25);
 lines3 = imopen(noteImg, line);
 
 line = strel('line', 20, 90);
 lines4 = imopen(noteImg, line);
 
-sliced = noteImg - lines - lines2 - lines3 - lines4;
+sliced = noteImg - lines;% - lines2 - lines3 - lines4;
+
 figure;
 imshow(sliced);
 
@@ -42,11 +43,12 @@ noNoteHeads = noteImg - noteHeads;
 line2 = strel('line', 10, 0);
 beams = imopen(noNoteHeads, line2);
 
-figure
+figure;
 imshow(noteHeads)
-figure
+figure;
 imshow(noNoteHeads)
-
+figure
+imshow(beams)
 for i = 2:length(STATS)
     
     CE = STATS(i).Centroid;
