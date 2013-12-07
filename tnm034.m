@@ -79,7 +79,7 @@ end
 a = '';
 %imshow(split_image{2});
 for i = 1:3
-    a = [a,readsegment(split_image{i},linepostemp(i,:),10)];
+    a = [a,readsegment(split_image{i},linepostemp(i,:),2)];
     a = [a,'n'];
 end
 a

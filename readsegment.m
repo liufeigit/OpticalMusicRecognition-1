@@ -2,7 +2,9 @@ function [notechar] = readsegment(binImg,linepos,lineheight)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 notechar = '';
-disk = strel('disk', 4);
+diskSize = calcDiscSize(calcLineDist(linepos, lineheight))
+
+disk = strel('disk', diskSize);
 diskOpen = imopen(binImg, disk); %picture including only noteheads
 
 noteImg = imreconstruct(diskOpen, binImg);

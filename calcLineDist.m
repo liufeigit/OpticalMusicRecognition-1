@@ -1,4 +1,5 @@
-function [lineDist] = calcLineDist(linepos, lineheight)
+
+function [lineDist] = calcLineDist(linepos, lineWidth)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % calcLineDist calculates the average distance between two lines
 %
@@ -18,7 +19,7 @@ for i = 1:size(linepos,2)
     end
 
     if dist(i) ~= 0
-        dist(i) = (dist(i)-lineheight);
+        dist(i) = (dist(i)-lineWidth);
         sumDist = sumDist + dist(i);
         nrOfDist = nrOfDist + 1;
     end
