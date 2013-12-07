@@ -15,7 +15,17 @@ imshow(noteImg);
 %destroy beams in image for easier finding of noteheads
 line = strel('line', 20, 0);
 lines = imopen(noteImg, line);
-sliced = noteImg - lines;
+
+line = strel('line', 15, 25);
+lines2 = imopen(noteImg, line);
+
+line = strel('line', 15, -25);
+lines3 = imopen(noteImg, line);
+
+line = strel('line', 20, 90);
+lines4 = imopen(noteImg, line);
+
+sliced = noteImg - lines - lines2 - lines3 - lines4;
 figure;
 imshow(sliced);
 
