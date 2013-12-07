@@ -12,11 +12,8 @@ function [ image_rot ] = houghrotate( image )
 %convert to gray image
 gray = rgb2gray(image);
 
-%find threshold level with otsus method
-lvl = graythresh(gray);
-
 %threshold image and invert
-binImg = 1 - im2bw(gray, lvl);
+binImg = adaptivethreshBW(gray);
 
 %calculate hough transform in two given intervalls
 [H1, ~, ~] = hough(binImg, 'Theta', -90:-75);
@@ -34,11 +31,11 @@ else
 end
 
 %get peaks
-peaks = houghpeaks(H);
+peaks = houghpeaks(H, 3);
 
 %Get the angle from strongest peak and check if it`s pos or neg. Then
 %calculate the angle. Then rotate the image with bicubic interpolation.
-temp  = theta(peaks(2));
+temp  = (theta(peaks(1,2)) + theta(peaks(2,2)) + theta(peaks(3,2)))/3;
 
 if(temp < 0)
      angle =  90 + temp;
