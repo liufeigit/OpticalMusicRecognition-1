@@ -33,7 +33,7 @@ number_of_rows = size(linepos,2)/5;
 
 long_distance_half = zeros(1,number_of_rows);
 index = 1;
-for i= 1:1:size(linepos,2)
+for i= 1:size(linepos,2)
     if(mod(i,5)==0)
         if(i == size(linepos,2))
             break;
@@ -47,7 +47,7 @@ end
 long_distance_half(end) = long_distance_half(end-1); 
 split_image = cell(1,number_of_rows);
 % Split the image 
-for i = 1:1:number_of_rows
+for i = 1:number_of_rows
     split_image{i} = binImg(linepos(5*(i-1)+1)-long_distance_half(i):linepos(5*(i-1)+5)+long_distance_half(i),:,:);
 end
 
@@ -72,8 +72,11 @@ a = '';
 %imshow(split_image{2});
 
 for i = 1:number_of_rows
+
     a = [a,readsegment(split_image{i},linepostemp(i,:),2)];
-    a = [a,'n'];
+    if(i < number_of_rows)
+        a = [a,'n'];
+    end
 end
 a
 

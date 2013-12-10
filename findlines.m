@@ -25,8 +25,8 @@ binImg2 = binImg2';
 %Horizontal projection
 a = sum(binImg2);
 
-figure
-plot(a)
+% figure
+% plot(a)
 
 %find a suitable threshold for finding peaks
 threshold = (mean(a)/std(a))*max(a)

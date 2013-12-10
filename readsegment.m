@@ -35,6 +35,8 @@ sliced = im2bw(sliced);
 
 %get picture with only noteheads
 noteHeads = imopen(sliced, disk);
+% figure
+% imshow(noteHeads)
 
 %label the noteheads
 imgLabel = bwlabel(noteHeads, 8);
@@ -42,12 +44,15 @@ STATS = regionprops(imgLabel, 'BoundingBox', 'Centroid');
 
 %image with only beams
 noNoteHeads = noteImg - noteHeads;
-line2 = strel('line', 10, 0);
-
+% figure
+% imshow(noNoteHeads)
+line2 = strel('line', 17, 0);
 beams1 = imopen(noNoteHeads, line2);
-line2 = strel('line', 10, -20);
+line2 = strel('line', 13, -18);
 beams2 = imopen(noNoteHeads, line2);
-beams = beams1 + beams2;
+line3 = strel('line', 13, 18);
+beams3 = imopen(noNoteHeads, line3);
+beams = beams1 + beams2 + beams3;
 beams = im2bw(beams);
 
 for i = 2:length(STATS)
@@ -67,39 +72,43 @@ for i = 2:length(STATS)
 
     a = sum(noteBeam');
     
-
-    
     numPeaks = size(findpeaks(a, 'MINPEAKDISTANCE', 4), 2);
     
     if(numPeaks > 1)
         %more than eight note        
     elseif(numPeaks == 1)
-        %eight note
-     
+        %eight note     
         notechar = [notechar,readFindNotes(CE,linepos)];
         
     else
       %quarter note or single eight note
       angle = 20;
-      flagLine1 = strel('line', 6, angle);
+      flagLine1 = strel('line', 7, angle);
       flagbeams1 = imopen(noNoteHeads, flagLine1);
-      flagLine2 = strel('line', 6, -angle);
+      flagLine2 = strel('line', 7, -angle);
       flagbeams2 = imopen(noNoteHeads, flagLine2);
       
       flagbeams = flagbeams1 + flagbeams2;
       flagbeams = im2bw(flagbeams);
       
-      noteBeam = flagbeams(:,(top_x-margin):(top_x+delta_x+margin));
-
       
-      a = sum(noteBeam');
-      numPeaks = size(findpeaks(a), 2);
+     if(CE(2) < linepos(1))
+        noteBeam = flagbeams(linepos(1):end,(top_x-margin):(top_x+delta_x+margin));
+     else
+        noteBeam = flagbeams(:,(top_x-margin):(top_x+delta_x+margin));
+     end
+     
+%      figure
+%      imshow(noteBeam);
+      
+     a = sum(noteBeam');
+     numPeaks = size(findpeaks(a), 2);
 
-      if(numPeaks == 0)
-          notechar = [notechar,upper(readFindNotes(CE,linepos))];
-      else
-          notechar = [notechar,readFindNotes(CE,linepos)];
-      end
+     if(numPeaks == 0)
+         notechar = [notechar,upper(readFindNotes(CE,linepos))];
+     else
+         notechar = [notechar,readFindNotes(CE,linepos)];
+     end
       
 
     end
