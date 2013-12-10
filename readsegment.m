@@ -48,9 +48,9 @@ noNoteHeads = noteImg - noteHeads;
 % imshow(noNoteHeads)
 line2 = strel('line', 17, 0);
 beams1 = imopen(noNoteHeads, line2);
-line2 = strel('line', 13, -18);
+line2 = strel('line', 10, -18);
 beams2 = imopen(noNoteHeads, line2);
-line3 = strel('line', 13, 18);
+line3 = strel('line', 10, 18);
 beams3 = imopen(noNoteHeads, line3);
 beams = beams1 + beams2 + beams3;
 beams = im2bw(beams);
@@ -66,15 +66,33 @@ for i = 2:length(STATS)
     delta_x = round(DATA(3));
     delta_y = round(DATA(4));
     
-    margin = 3;
+    margin = 4;
     
     noteBeam = beams(:,(top_x-margin):(top_x+delta_x+margin));
-
+      
     a = sum(noteBeam');
+    
+    %%%%%%algorithm to check how many beams that appear
+    beamCounter = 0;
+    occurrences = 0;
+    for colb = 1:size(noteBeam,2)
+        if(beamCounter >= 2)
+            occurrences = occurrences + 1;
+        end
+        beamCounter = 0;
+        for rowb = 2:size(noteBeam,1)
+            if(noteBeam(rowb,colb) == 1)
+                if(noteBeam(rowb-1,colb) == 0)
+                    beamCounter = beamCounter + 1;
+                end
+            end
+        end
+    end
+    %%%%%%%
     
     numPeaks = size(findpeaks(a, 'MINPEAKDISTANCE', 4), 2);
     
-    if(numPeaks > 1)
+    if(numPeaks > 1 || occurrences >= 3)
         %more than eight note        
     elseif(numPeaks == 1)
         %eight note     
