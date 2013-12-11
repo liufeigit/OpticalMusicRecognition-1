@@ -2,20 +2,48 @@ function [notechar] = readsegment(binImg,linepos,lineWidth)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 notechar = '';
-diskSize = calcDiscSize(calcLineDist(linepos, lineWidth))
+diskSize = calcDiscSize(calcLineDist(linepos, lineWidth));
 
+
+% figure
+% imshow(binImg)
+
+%%%%deleting clefs
+binImg(:, 1:10) = 0;
+vline = strel('line', 10, 90);
+binImg2 = imclose(binImg, vline);
+
+img2Label = bwlabel(binImg2, 8);
+STATS2 = regionprops(img2Label, 'BoundingBox', 'Centroid');
+
+staffWidth = round(linepos(5)-linepos(1));
+
+for numstat = 1:length(STATS2)
+    
+    DATA2 = STATS2(numstat).BoundingBox;
+    topx = round(DATA2(1));
+    topy = round(DATA2(2));
+    deltax = round(DATA2(3));
+    deltay = round(DATA2(4));
+    
+    if(deltay > (staffWidth+10))
+        binImg(:,1:(topx+deltax)) = 0;
+        break;
+    end
+    
+end
+
+% figure
+% imshow(binImg2)
+%%%%%%
+
+%opening with discelement to find noteheads
 disk = strel('disk', diskSize);
 diskOpen = imopen(binImg, disk); %picture including only noteheads
-
 noteImg = imreconstruct(diskOpen, binImg);
-% figure;
-% imshow(noteImg);
-
-%
-
 
 %destroy beams in image for easier finding of noteheads
-line = strel('line', 20, 0);
+line = strel('line', 25, 0);
 lines = imopen(noteImg, line);
 
 line = strel('line', 20, 25);
@@ -29,12 +57,14 @@ lines4 = imopen(noteImg, line);
 
 sliced = noteImg - lines - lines2 - lines3 - lines4;
 sliced = im2bw(sliced);
+
 % figure;
 % imshow(sliced);
 
 
 %get picture with only noteheads
 noteHeads = imopen(sliced, disk);
+
 % figure
 % imshow(noteHeads)
 
@@ -44,18 +74,24 @@ STATS = regionprops(imgLabel, 'BoundingBox', 'Centroid');
 
 %image with only beams
 noNoteHeads = noteImg - noteHeads;
-% figure
+
+% figure 
 % imshow(noNoteHeads)
+
 line2 = strel('line', 17, 0);
 beams1 = imopen(noNoteHeads, line2);
-line2 = strel('line', 10, -18);
+line2 = strel('line', 15, -15);
 beams2 = imopen(noNoteHeads, line2);
-line3 = strel('line', 10, 18);
-beams3 = imopen(noNoteHeads, line3);
+line2 = strel('line', 15, 15);
+beams3 = imopen(noNoteHeads, line2);
+
 beams = beams1 + beams2 + beams3;
 beams = im2bw(beams);
 
-for i = 2:length(STATS)
+% figure
+% imshow(beams)
+
+for i = 1:length(STATS)
     
     CE = STATS(i).Centroid;
 
@@ -68,9 +104,21 @@ for i = 2:length(STATS)
     
     margin = 4;
     
-    noteBeam = beams(:,(top_x-margin):(top_x+delta_x+margin));
-      
-    a = sum(noteBeam');
+    %noteBeam = beams(:,(top_x-margin):(top_x+delta_x+margin));
+    
+    if(CE(2) < (linepos(1)-5))
+        noteBeam = beams(round(linepos(1)):end,(top_x-margin):(top_x+delta_x+margin));
+    elseif(CE(2) > (linepos(5)+5))
+        noteBeam = beams(1:round((end-linepos(5))),(top_x-margin):(top_x+delta_x+margin));
+    else
+        noteBeam = beams(:,(top_x-margin):(top_x+delta_x+margin));
+    end
+    
+    %erase white pixels around the notehead
+    noteBeam((top_y-margin):(top_y+delta_y+margin),(top_x-margin):(top_x+delta_x+margin)) = 0;
+    
+%     figure
+%     imshow(noteBeam)
     
     %%%%%%algorithm to check how many beams that appear
     beamCounter = 0;
@@ -90,43 +138,61 @@ for i = 2:length(STATS)
     end
     %%%%%%%
     
+    a = sum(noteBeam');
+    
+%     figure
+%     plot(a)
+
     numPeaks = size(findpeaks(a, 'MINPEAKDISTANCE', 4), 2);
     
-    if(numPeaks > 1 || occurrences >= 3)
-        %more than eight note        
-    elseif(numPeaks == 1)
-        %eight note     
+    if(numPeaks > 1 || occurrences >= 3) %more than eight note  
+              
+    elseif(numPeaks == 1) %eight note
         notechar = [notechar,readFindNotes(CE,linepos)];
         
-    else
-      %quarter note or single eight note
+    else %quarter note or single eight note
+      
+      %create picture including only the current note 
+      singleNote = zeros(size(noteImg));
+      singleNote(round(CE(2)), round(CE(1))) = 1;
+      sNote = imreconstruct(singleNote, noteImg);
+      sNote = sNote - noteHeads;
+      sNote = im2bw(sNote);
+      
+%       figure
+%       imshow(sNote)
+      
       angle = 20;
       flagLine1 = strel('line', 7, angle);
-      flagbeams1 = imopen(noNoteHeads, flagLine1);
+      flagbeams1 = imopen(sNote, flagLine1);
       flagLine2 = strel('line', 7, -angle);
-      flagbeams2 = imopen(noNoteHeads, flagLine2);
+      flagbeams2 = imopen(sNote, flagLine2);
       
       flagbeams = flagbeams1 + flagbeams2;
       flagbeams = im2bw(flagbeams);
       
-      
-     if(CE(2) < linepos(1))
-        noteBeam = flagbeams(linepos(1):end,(top_x-margin):(top_x+delta_x+margin));
-     else
-        noteBeam = flagbeams(:,(top_x-margin):(top_x+delta_x+margin));
-     end
-     
-%      figure
-%      imshow(noteBeam);
-      
-     a = sum(noteBeam');
-     numPeaks = size(findpeaks(a), 2);
+      %erase white pixels around the notehead
+      flagbeams((top_y-margin):(top_y+delta_y+margin),(top_x-margin):(top_x+delta_x+margin)) = 0;
 
-     if(numPeaks == 0)
-         notechar = [notechar,upper(readFindNotes(CE,linepos))];
-     else
-         notechar = [notechar,readFindNotes(CE,linepos)];
-     end
+      if(CE(2) < linepos(1))
+          noteBeam2 = flagbeams(round(linepos(1)):end,(top_x-margin):(top_x+delta_x+margin));
+      elseif(CE(2) > linepos(5))
+          noteBeam2 = flagbeams(1:round((end-linepos(5))),(top_x-margin):(top_x+delta_x+margin));
+      else
+          noteBeam2 = flagbeams(:,(top_x-margin):(top_x+delta_x+margin));
+      end
+      
+%       figure
+%       imshow(noteBeam2)
+      
+      a = sum(noteBeam2');
+      numPeaks = size(findpeaks(a), 2);
+
+      if(numPeaks == 0)
+          notechar = [notechar,upper(readFindNotes(CE,linepos))];
+      else
+          notechar = [notechar,readFindNotes(CE,linepos)];
+      end
       
 
     end

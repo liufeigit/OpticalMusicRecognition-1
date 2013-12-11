@@ -48,7 +48,7 @@ long_distance_half(end) = long_distance_half(end-1);
 split_image = cell(1,number_of_rows);
 % Split the image 
 for i = 1:number_of_rows
-    split_image{i} = binImg(linepos(5*(i-1)+1)-long_distance_half(i):linepos(5*(i-1)+5)+long_distance_half(i),:,:);
+    split_image{i} = binImg(round(linepos(5*(i-1)+1)-long_distance_half(i)):round(linepos(5*(i-1)+5)+long_distance_half(i)),:,:);
 end
 
 linepostemp = zeros(number_of_rows,5);
@@ -78,7 +78,7 @@ for i = 1:number_of_rows
         a = [a,'n'];
     end
 end
-a
+strout = a;
 
 
 

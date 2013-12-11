@@ -1,6 +1,13 @@
 %read image
 clear all;
 clc;
-image = im2double(imread('img/im3s.jpg'));
+fileName = 'img/im9s.jpg';
+image = im2double(imread(fileName));
 
-tnm034(image);
+a = tnm034(image);
+
+[status, corr] = checkNotes(a, fileName);
+
+status
+disp(corr)
+disp(a)
