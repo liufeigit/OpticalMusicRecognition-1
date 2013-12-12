@@ -25,9 +25,9 @@ hmax2 = max(max(H2));
 
 %sample in higher resolution
 if(hmax1 > hmax2)
-    [H, theta, rho] = hough(binImg, 'Theta', -90:0.01:-75);
+    [H, theta, ~] = hough(binImg, 'Theta', -90:0.01:-75);
 else
-    [H, theta, rho] = hough(binImg, 'Theta', 75:0.01:89.9);
+    [H, theta, ~] = hough(binImg, 'Theta', 75:0.01:89.9);
 end
 
 %get peaks
@@ -46,7 +46,7 @@ end
 image_rot = imrotate(image,angle,'bicubic');
 
 %remove dirt around the image caused by the rotation
-dist = ceil((size(binImg, 2))*sin(angle*pi/180));
+dist = abs(ceil((size(binImg, 2))*sin(angle*pi/180)));
 image_rot(1:dist, :, :) = 1;
 image_rot(:, 1:dist, :) = 1;
 image_rot((size(image_rot,1)-dist):size(image_rot,1), :, :) = 1;

@@ -61,7 +61,7 @@ for lines = 1:size(lpositions,2)
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
         else %%%%%%%%%%%%pixel is black%%%%%%%%%%%%%%
-            isline=0;
+%             isline=0;
             
             %check surroundings of the original lineposition
             
@@ -125,7 +125,7 @@ for lines = 1:size(lpositions,2)
 
                 if(isline == 1)
                     lpositions(lines) = linepos(lines)-3;    
-                   
+                end   
             else
                 if(abs(lpositions(lines)-linepos(lines)) >= 3)
                     lpositions(lines) = linepos(lines);

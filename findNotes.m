@@ -1,45 +1,33 @@
-function [StringOutput] = findNotes(lineArrayRow, lineheight ,binImg)
-imgLabel = bwlabel(binImg, 8);
-STATS = regionprops(bwlabel(binImg, 8), 'BoundingBox', 'Centroid');
-
-Output = cell(1,1);
+function[outchar] = findNotes(centroid,lines)
 
 
-for j = 2:length(STATS)
-     
-    CE = STATS(j).Centroid;
-    BB = STATS(j).BoundingBox;
-    
-   
-    a = binImg(:,round(BB(1):BB(1)+BB(3)));
-    %figure;
-    %imshow(a);
-    %figure;
-    BW2 = bwmorph(a,'thin',Inf);
-   % figure;
-    %imshow(BW2);
-    se = strel('disk', 4);
-    open2 = imopen(a, se);
-    %imshow(open2);
-    
-    
-    imgLabel2 = bwlabel(open2, 8);
-    STATSsmallimage = regionprops(bwlabel(open2, 8), 'BoundingBox', 'Centroid');
-    for i = 1:length(STATSsmallimage)
-         CE2 = STATSsmallimage(i).Centroid;
-         BB2 = STATSsmallimage(i).BoundingBox;
-         %ful hacks !!
-         if((BB2(3)> 7.0) && (BB2(4)>7.0))
-          
-           Output{1} =  [Output{1},' ',readFindNotes(CE2,lineArrayRow)];
-         end  
-    end
-    
-    
+OutChar = {'e4','d4','c4','b3','a3','g3','f3','e3','d3','c3','b2','a2','g2','f2','e2','d2','c2'};
 
+LookUpTable = zeros(1,13+4);
+lineDist = 9.5;%calcLineDist(lines,0);
+LookUpTable(1)  = lines(1)-lineDist*3;
+LookUpTable(2)  = lines(1)-lineDist*(5/2);
+LookUpTable(3)  = lines(1)-lineDist*2;
+LookUpTable(4)  = lines(1)-lineDist*(3/2);
+LookUpTable(5)  = lines(1)-lineDist;
+LookUpTable(6)  = lines(1)-lineDist/2;
+LookUpTable(7)  = lines(1) ;
+LookUpTable(8)  = lines(1) + (lines(2)-lines(1))/2;
+LookUpTable(9)  = lines(2) ;
+LookUpTable(10)  = lines(2) + (lines(3)-lines(2))/2;
+LookUpTable(11)  = lines(3) ;
+LookUpTable(12)  = lines(3) + (lines(4)-lines(3))/2;
+LookUpTable(13)  = lines(4);
+LookUpTable(14) = lines(4) + (lines(5)-lines(4))/2;
+LookUpTable(15) = lines(5);
+LookUpTable(16) = lines(5)+lineDist/2;
+LookUpTable(17) = lines(5)+lineDist;
+LookUpTable = round(LookUpTable);
 
-end
+distance =  abs(LookUpTable-ceil(centroid(1,2)));
+[~,idx] =min(distance);
+line = LookUpTable(idx);
+        
+outchar = OutChar{LookUpTable==line};
 
-StringOutput =  Output{1};
- 
 end

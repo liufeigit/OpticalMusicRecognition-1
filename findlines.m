@@ -20,7 +20,7 @@ binImg2 = bwmorph(binImg2, 'thin');
 
 binImg2 = binImg2';
 
-%binImg2(:,1:10) = 0;
+binImg2(:,1:10) = 0;
 
 %Horizontal projection
 a = sum(binImg2);
@@ -29,10 +29,18 @@ a = sum(binImg2);
 % plot(a)
 
 %find a suitable threshold for finding peaks
-threshold = (mean(a)/std(a))*max(a)
+threshold = (mean(a)/std(a))*max(a);
 
 %get peaks (line positions)
 [linepeaks,linepos] = findpeaks(a, 'MINPEAKHEIGHT', threshold, 'MINPEAKDISTANCE', 5);
+
+numpos = 5*round(size(linepos,2)/5);
+
+[~, sortedidx] = sort(linepeaks, 'descend');
+
+originalpos = linepos(sortedidx);
+
+linepos = sort(originalpos(1:numpos), 'ascend');
 
 end
 
